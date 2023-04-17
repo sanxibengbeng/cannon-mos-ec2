@@ -7,7 +7,9 @@ expressWs(app);
 
 app.use(express.static('public'))
 app.use('/wss', websocket)
-app.get('*', (req, res) => {})
+app.get('/hi', (req, res) => {
+  res.send("hello")
+})
 app.listen(3000, () => {
   console.log('server is listening on port 3000')
 })

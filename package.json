@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./server/server.js"
+    "start": "cross-env NODE_ENV=production node ./server/server.js",
+    "start:dev": "nodemon --exec cross-env NODE_ENV=dev node ./server/server.js"
   },
   "keywords": [],
   "author": "",
@@ -13,9 +14,11 @@
     "async": "^3.2.4",
     "aws-sdk": "^2.1359.0",
     "aws-xray-sdk": "^3.5.0",
+    "dotenv": "^16.0.3",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "nodemon": "^2.0.22",
+    "short-uuid": "^4.2.2",
     "ws": "^7.1.0"
   }
 }

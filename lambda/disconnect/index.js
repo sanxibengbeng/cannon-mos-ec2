@@ -18,7 +18,6 @@ const defaultRegion = process.env.DEFAULT_REGION
 // }
 
 exports.handler = function (event, context, callback) {
-  console.log(event)
   connectionId = event.requestContext.connectionId
   cleanup(connectionId)
   const response = {
@@ -79,8 +78,12 @@ function cleanup (connectionId) {
         )
       },
       function (data, callback) {
-        console.log('delete')
+        if (null == data) {
+          callback("no data in cleanup", data)
+          return
+        }
         ids = JSON.parse(data.connectionIds.S)
+        console.log('delete connections' ,ids)
         let keys = []
         for (let i = 0; i < ids.length; i++) {
           keys.push({
@@ -89,16 +92,14 @@ function cleanup (connectionId) {
         }
         deleteRecords(ddb, playerTableName, keys, function (err, data) {
           if (err) {
-            console.log(err)
             callback(err, null)
           } else {
-            console.log(data)
             callback(null, null)
           }
         })
       },
       function (data, callback) {
-        console.log('delete')
+        console.log('delete room', roomId)
         deleteRecord(
           ddb,
           gameSessionTableName,
@@ -107,10 +108,8 @@ function cleanup (connectionId) {
           },
           function (err, data) {
             if (err) {
-              console.log(err)
               callback(err, null)
             } else {
-              console.log(data)
               callback(null, null)
             }
           }
@@ -118,8 +117,7 @@ function cleanup (connectionId) {
       }
     ],
     function (err, result) {
-      console.log(err)
-      console.log(result)
+      console.log("delete callback", err, result)
       if (!err) {
         console.log('updated ok')
       }

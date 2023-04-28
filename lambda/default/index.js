@@ -1,17 +1,12 @@
-const { equal } = require('assert')
 const async = require('async')
 const AWSXRay = require('aws-xray-sdk')
 const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 const process = require('process')
 const shortUUID = require('short-uuid')
 
-const fifoQueueUrl = process.env.FIFO_QUEUE_URL || "no_fifo_queue"
-const delayedQueueUrl = process.env.DELAYED_QUEUE_URL || "no_delay_que"
-const fifoQueueGroupId = process.env.FIFO_QUEUE_GROUP_ID || "no_que_group_id"
 const playerTableName = process.env.PLAYER_TABLE_NAME || "no_config_table"
 const gameSessionTableName = process.env.GAME_SESSION_TABLE_NAME || "no_config_table"
 const defaultRegion = process.env.DEFAULT_REGION || "no_config_region"
-const sqs = initSqs()
 const ddb = initDynamoDB()
 const enableLog = process.env['LOG_ENABLED'] || false
 var wsMap = {}
@@ -19,17 +14,8 @@ var wsMap = {}
 //exports.handler = handleAction
 exports.handler = function (event, context, callback) {
   console.log("default hanler ", event)
-  if (event['requestContext']) {
-    wsMap = event.requestContext.wsMap
-    handleAction(event)
-  } else if (event['Records']) {
-    handleMessages(event)
-  }
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({ message: event.requestContext.connectionId})
-  }
-  //callback(null, response)
+  wsMap = event.requestContext.wsMap
+  handleAction(event)
 }
 
 function handleAction (event) {
@@ -62,96 +48,8 @@ function handleAction (event) {
   }
 }
 
-function handleMessages (event) {
-  records = event.Records
-  for (let i = 0; i < records.length; i++) {
-    record = records[i]
-    request = JSON.parse(record['body'])
-    if (!isNull(request) && !isNull(request['action'])) {
-      switch (request['action']) {
-        case 'newtargets':
-          console.log('new targets')
-          proceedNewTargets(request.data)
-          break
-        case 'stop':
-          console.log('stop')
-          proceedStop(request.data)
-          break
-        default:
-          console.log('default')
-          break
-      }
-    } else {
-      console.log(request)
-      console.log(isNull(request))
-      console.log(isNull(request.action))
-    }
-  }
-}
 
-function proceedStop (request) {
-  async.waterfall(
-    [
-      function (callback) {
-        sendFifoMessage(
-          sqs,
-          fifoQueueUrl,
-          JSON.stringify({
-            data: request,
-            action: 'stop'
-          }),
-          function (err, data) {
-            if (err) {
-              console.log(err)
-              callback(err, null)
-            } else {
-              console.log(data)
-              callback(null, data)
-            }
-          }
-        )
-      }
-    ],
-    function (err, result) {
-      console.log(err, result)
-      if (!err) {
-        console.log('proceedStop ok')
-      }
-    }
-  )
-}
 
-function proceedNewTargets (request) {
-  async.waterfall(
-    [
-      function (callback) {
-        sendFifoMessage(
-          sqs,
-          fifoQueueUrl,
-          JSON.stringify({
-            data: request,
-            action: 'newtargets'
-          }),
-          function (err, data) {
-            if (err) {
-              console.log(err)
-              callback(err, null)
-            } else {
-              console.log(data)
-              callback(null, data)
-            }
-          }
-        )
-      }
-    ],
-    function (err, result) {
-      console.log(err, result)
-      if (!err) {
-        console.log('proceedNewTargets ok')
-      }
-    }
-  )
-}
 
 function stopGame (request) {
   async.waterfall(
@@ -704,35 +602,3 @@ function readRecord (ddb, tableName, keys, callback) {
     callback(err, data)
   })
 }
-
-function initSqs () {
-  // Set the region
-  console.log("default region in init sqs", defaultRegion)
-  AWS.config.update({ region: defaultRegion })
-
-  // Create an SQS service object
-  return new AWS.SQS({ apiVersion: '2012-11-05' })
-}
-
-function sendFifoMessage (sqs, queueUrl, message, callback) {
-  var params = {
-    // Remove DelaySeconds parameter and value for FIFO queues
-    // DelaySeconds: 10,
-    MessageAttributes: {},
-    MessageBody: message,
-    MessageDeduplicationId: Math.random() * 100 + '', // Required for FIFO queues
-    MessageGroupId: fifoQueueGroupId, // Required for FIFO queues
-    QueueUrl: queueUrl
-  }
-
-  sqs.sendMessage(params, function (err, data) {
-    callback(err, data)
-  })
-}
-
-function log (...args) {
-  console.log(args)
-}
-
-// createRoom("12345", "yagrxu")
-// joinRoom("54321", "yagrxu")

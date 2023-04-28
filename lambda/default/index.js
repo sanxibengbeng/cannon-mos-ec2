@@ -594,6 +594,15 @@ function filterHit (targets, shootInfo) {
 }
 
 function canHitTarget (originX, originY, angle, targetX, targetY) {
+  const slope = Math.tan(angle)
+  const y_intercept = originY - slope * originX
+  const distance =
+    Math.abs(slope * targetX - targetY + y_intercept) /
+    Math.sqrt(slope * slope + 1)
+  return distance <= 2
+}
+
+function canHitTarget2 (originX, originY, angle, targetX, targetY) {
   //const slope = Math.tan(angle)
   //var distance = (targetY - originY) - (targetX - originX) * slope
   //r2 = (targetY - originY) / (targetX - originX) 

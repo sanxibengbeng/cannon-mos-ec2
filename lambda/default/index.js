@@ -500,20 +500,6 @@ function canHitTarget (originX, originY, angle, targetX, targetY) {
   return distance <= 2
 }
 
-function canHitTarget2 (originX, originY, angle, targetX, targetY) {
-  //const slope = Math.tan(angle)
-  //var distance = (targetY - originY) - (targetX - originX) * slope
-  //r2 = (targetY - originY) / (targetX - originX) 
-  ang2 = Math.atan2(targetY -originY, targetX -originX) * 180 / Math.PI
-  console.log("canhit ", originX, originY, angle, targetX, targetY, ang2)
-  return Math.abs(angle - ang2) <= 5
-  //const y_intercept = originY - slope * originX
-  //distance =
-  //  Math.abs(slope * targetX - targetY + y_intercept) /
-  //  Math.sqrt(slope * slope + 1)
-  //return distance <= 2
-}
-
 function getNearestPoint (x, y, pointList) {
   let nearestPoint = null
   let minDistance = Number.MAX_VALUE

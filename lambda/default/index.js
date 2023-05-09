@@ -4,6 +4,8 @@ const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 const process = require('process')
 const shortUUID = require('short-uuid')
 
+canhit = require("../logic/canhit").canHitTarget
+
 const playerTableName = process.env.PLAYER_TABLE_NAME || "no_config_table"
 const gameSessionTableName = process.env.GAME_SESSION_TABLE_NAME || "no_config_table"
 const defaultRegion = process.env.DEFAULT_REGION || "no_config_region"
@@ -462,7 +464,7 @@ function filterHit (targets, shootInfo) {
   console.log("filter-hit ", shootInfo)
   for (let i = 0; i < targets.length; i++) {
     if (
-      canHitTarget(
+      canhit(
         shootInfo.origin.x,
         shootInfo.origin.y,
         shootInfo.angle,
@@ -470,49 +472,12 @@ function filterHit (targets, shootInfo) {
         targets[i].y
       )
     ) {
-      possibleHit.push(targets[i])
-      // update by yulong,remove all that hits
-      // ret.hit.push(targets[i].id)
-      // ret.targets = targets.filter(obj => obj.id !== targets[i].id)
+      pointToRemove = targets[i]
+      ret.hit.push(pointToRemove.id)
+      ret.targets = targets.filter(obj => obj.id !== pointToRemove.id)
     }
-  }
-  console.log('possibleHit', possibleHit)
-  if (possibleHit.length > 0) {
-    pointToRemove = getNearestPoint(
-      shootInfo.origin.x,
-      shootInfo.origin.y,
-      possibleHit
-    )
-    console.log("pointToRemove ", pointToRemove)
-    console.log(targets.filter(obj => obj.id !== pointToRemove.id))
-    ret.hit.push(pointToRemove.id)
-    ret.targets = targets.filter(obj => obj.id !== pointToRemove.id)
   }
   return ret
-}
-
-function canHitTarget (originX, originY, angle, targetX, targetY) {
-  const slope = Math.tan(angle)
-  const y_intercept = originY - slope * originX
-  const distance =
-    Math.abs(slope * targetX - targetY + y_intercept) /
-    Math.sqrt(slope * slope + 1)
-  return distance <= 2
-}
-
-function getNearestPoint (x, y, pointList) {
-  let nearestPoint = null
-  let minDistance = Number.MAX_VALUE
-  for (let i = 0; i < pointList.length; i++) {
-    const point = pointList[i]
-    //const distance = Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2)
-    const distance = Math.abs(x - point.x)
-    if (distance < minDistance) {
-      minDistance = distance
-      nearestPoint = point
-    }
-  }
-  return nearestPoint
 }
 
 function getRandomInt (size) {

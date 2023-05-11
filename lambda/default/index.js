@@ -417,7 +417,9 @@ function handleShoot (body) {
         )
       },
       function (data, callback) {
+        console.log("before-filterHit", data.targets.S)
         result = filterHit(JSON.parse(data.targets.S), shootItem)
+        console.log("after-filterHit", result)
         existingTargets = result.targets
         shootItem.hit = result.hit
         if (result.hit.length > 0) {
@@ -503,7 +505,7 @@ function filterHit (targets, shootInfo) {
     ) {
       pointToRemove = targets[i]
       ret.hit.push(pointToRemove.id)
-      ret.targets = targets.filter(obj => obj.id !== pointToRemove.id)
+      ret.targets = ret.targets.filter(obj => obj.id !== pointToRemove.id)
     }
   }
   return ret

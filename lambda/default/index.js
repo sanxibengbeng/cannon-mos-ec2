@@ -3,6 +3,7 @@ const AWSXRay = require('aws-xray-sdk')
 const AWS = AWSXRay.captureAWS(require('aws-sdk'))
 const process = require('process')
 const shortUUID = require('short-uuid')
+AWSXRay.setContextMissingStrategy(()=>{console.log("no context error")});
 
 canhit = require("../logic/canhit").canHitTarget
 
@@ -16,7 +17,7 @@ var wsMap = {}
 //var Queue = require('better-queue');
 var Queue = require('fastq');
 const shootQueue = new Queue((info, cb) => {
-    console.log("got info from queue", info)
+    //console.log("got info from queue", info)
     switch (info['action']) {
       case 'shoot':
         handleShoot(info)
@@ -47,15 +48,12 @@ function handleAction (event) {
   if (!isNull(request) && !isNull(request['action'])) {
     switch (request['action']) {
       case 'create':
-        console.log('create')
         createRoom(connectionId, request['room'])
         break
       case 'join':
-        console.log('join')
         joinRoom(connectionId, request['room'], domain, stage)
         break
       case 'shoot':
-        console.log('shoot')
         proceedShooting(request, connectionId, domain, stage)
         break
       default:
@@ -64,8 +62,6 @@ function handleAction (event) {
     }
   } else {
     console.log(request)
-    console.log(isNull(request))
-    console.log(isNull(request.action))
   }
 }
 
@@ -84,10 +80,8 @@ function stopGame (request) {
           },
           function (err, data) {
             if (err) {
-              console.log(err)
               callback(err, null)
             } else {
-              console.log(data)
               callback(null, data.Item)
             }
           }
@@ -117,7 +111,6 @@ function stopGame (request) {
       }
     ],
     function (err, result) {
-      console.log(err, result)
       if (!err) {
         console.log('create ok')
       }
@@ -139,8 +132,6 @@ function createRoom (connectionId, roomName) {
   async.waterfall(
     [
       function (callback) {
-        console.log(connectionId, process.env.PLAYER_TABLE_NAME)
-        console.log('update player table', playerTableName)
         updateRecord(
           ddb,
           playerTableName,
@@ -154,14 +145,12 @@ function createRoom (connectionId, roomName) {
               console.log(err)
               callback(err, null)
             } else {
-              console.log(data)
               callback(null, data)
             }
           }
         )
       },
       function (data, callback) {
-        console.log('update session table', gameSessionTableName)
         updateRecord(
           ddb,
           gameSessionTableName,
@@ -171,10 +160,8 @@ function createRoom (connectionId, roomName) {
           },
           function (err, data) {
             if (err) {
-              console.log(err)
               callback(err, null)
             } else {
-              console.log(data)
               callback(null, data)
             }
           }
@@ -277,18 +264,18 @@ function joinRoom (connectionId, roomName, domain, stage) {
         )
       },
       function (data, callback) {
-        console.log("data123", data)
+        //console.log("data123", data)
         ids = JSON.parse(data.connectionIds.S)
-        console.log("data123 ids", ids)
+        //console.log("data123 ids", ids)
         intervalObj = setInterval(() =>{
           var newTargetInfo = {
             id: shortUUID.generate(),
             action:'new target',
             roomId: data.roomId.S
           }
-          console.log('push info new target', newTargetInfo)
+          //console.log('push info new target', newTargetInfo)
           shootQueue.push(newTargetInfo)
-          console.log("tasks in queue ", shootQueue.getQueue())
+          //console.log("tasks in queue ", shootQueue.getQueue())
           //console.log(shootQueue)
         }, genInterval)
         setTimeout(()=>{
@@ -321,7 +308,6 @@ function handleNewTargets (body) {
   async.waterfall(
     [
       function (callback) {
-        console.log('read targets')
         readRecord(
           ddb,
           gameSessionTableName,
@@ -330,10 +316,8 @@ function handleNewTargets (body) {
           },
           function (err, data) {
             if (err) {
-              console.log(err)
               callback(err, null)
             } else {
-              console.log(data)
               callback(null, data.Item)
             }
           }
@@ -343,7 +327,7 @@ function handleNewTargets (body) {
         if (data.running.S == 'false') {
           callback(new Error('already stopped'), null)
         }
-        console.log('update targets')
+        //console.log('update targets')
         updatedTargets = JSON.parse(data.targets.S).concat(
           request.targets
         )
@@ -526,7 +510,7 @@ function randomTargets (number) {
 }
 
 function notifyClient(item, callback) {
-  console.log('notifyClient', item)
+  //console.log('notifyClient', item)
   var wsClient = wsMap[item.id] || null
   if (null == wsClient) {
     console.log("connection not exist ", item)
@@ -536,7 +520,7 @@ function notifyClient(item, callback) {
 }
 
 function notifyClients (ids, data, callback) {
-  console.log("update-target ", ids, data)
+  //console.log("update-target ", ids, data)
   notifyItem = (id, callback)=> {
     item = {
       'id' :id,
@@ -545,12 +529,12 @@ function notifyClients (ids, data, callback) {
     notifyClient(item, callback)
   }
   async.each(ids, notifyItem, function (err) {
-      console.log("notify callback ", err)
+      //console.log("notify callback ", err)
   })
 }
 
 function initDynamoDB () {
-  console.log("default region in init ddb", defaultRegion)
+  //console.log("default region in init ddb", defaultRegion)
   // Set the region
   AWS.config.update({ region: defaultRegion })
 

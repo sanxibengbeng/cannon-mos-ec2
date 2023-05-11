@@ -1,6 +1,6 @@
 const process = require('process')
-const laserWith = process.env.LaserWidth || 0.6
-const mosquetoWith = process.env.MosquetoWidth || 1
+const laserWidth = process.env.LaserWidth || 0.6
+const mosWidth = process.env.MosquetoWidth || 1.0
 
 function canHitTarget (originX, originY, angle, targetX, targetY) {
   var newTargetX = targetX - originX
@@ -32,8 +32,9 @@ function canHitTarget (originX, originY, angle, targetX, targetY) {
     return false
   }
   var targetDisToPath = distance * Math.sin(diffAngle)
-  console.log('width', laserWith, mosquetoWith, 'angles', targetAngle/Math.PI * 180, angle, diffAngle/Math.PI*180, "x and y", newTargetX, newTargetY, targetDisToPath)
-  return targetDisToPath <= (laserWith + mosquetoWith)/2
+  console.log("shoot param", originX, originY, angle, targetX, targetY)
+  console.log('width', laserWidth, mosWidth, 'angles', targetAngle/Math.PI * 180, angle, diffAngle/Math.PI*180, "x and y", newTargetX, newTargetY, targetDisToPath)
+  return targetDisToPath <= (laserWidth/2 + mosWidth/2)
 }
 
 function filterHit (targets, shootInfo) {

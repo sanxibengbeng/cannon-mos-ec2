@@ -27,3 +27,7 @@ test('canhit in line 135', () => {
 test('cannot hit in line 135 ,target 45', () => {
     expect(canhit(-4, -5, 135, -2, -3)).toBe(false);
 });
+
+test('can hit ', () => {
+    expect(canhit(5, -4, 108.0539855950312, 4, -1)).toBe(true);
+});

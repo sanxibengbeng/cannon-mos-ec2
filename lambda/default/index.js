@@ -7,16 +7,35 @@ const shortUUID = require('short-uuid')
 canhit = require("../logic/canhit").canHitTarget
 
 const playerTableName = process.env.PLAYER_TABLE_NAME || "no_config_table"
+const genInterval = process.env.GEN_MOS_INTERVAL || 5000
 const gameSessionTableName = process.env.GAME_SESSION_TABLE_NAME || "no_config_table"
 const defaultRegion = process.env.DEFAULT_REGION || "no_config_region"
 const ddb = initDynamoDB()
 const enableLog = process.env['LOG_ENABLED'] || false
 var wsMap = {}
+//var Queue = require('better-queue');
+var Queue = require('fastq');
+const shootQueue = new Queue((info, cb) => {
+    console.log("got info from queue", info)
+    switch (info['action']) {
+      case 'shoot':
+        handleShoot(info)
+        break
+      case 'new target':
+        handleNewTargets(info)
+        break
+      default:
+        console.log("queue no handler for ", info)
+    }
+    cb(null, {})
+  }, 1)
+
 
 //exports.handler = handleAction
 exports.handler = function (event, context, callback) {
   console.log("default hanler ", event)
   wsMap = event.requestContext.wsMap
+
   handleAction(event)
 }
 
@@ -111,7 +130,9 @@ function proceedShooting (request, connectionId, domain, stage) {
   shootInfo.connectionId = connectionId
   shootInfo.domain = domain
   shootInfo.stage = stage
-  handleShoot(shootInfo)
+  //handleShoot(shootInfo)
+  // add shoot to queue 
+  shootQueue.push(shootInfo)
 }
 
 function createRoom (connectionId, roomName) {
@@ -260,8 +281,16 @@ function joinRoom (connectionId, roomName, domain, stage) {
         ids = JSON.parse(data.connectionIds.S)
         console.log("data123 ids", ids)
         intervalObj = setInterval(() =>{
-          handleNewTargets({roomId: data.roomId.S})
-        }, 5000)
+          var newTargetInfo = {
+            id: shortUUID.generate(),
+            action:'new target',
+            roomId: data.roomId.S
+          }
+          console.log('push info new target', newTargetInfo)
+          shootQueue.push(newTargetInfo)
+          console.log("tasks in queue ", shootQueue.getQueue())
+          //console.log(shootQueue)
+        }, genInterval)
         setTimeout(()=>{
           clearInterval(intervalObj);
           stopGame({roomId: data.roomId.S})

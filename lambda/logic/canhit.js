@@ -1,4 +1,3 @@
-const { nextTick } = require("async")
 const process = require('process')
 const laserWith = process.env.LaserWidth || 0.6
 const mosquetoWith = process.env.MosquetoWidth || 1

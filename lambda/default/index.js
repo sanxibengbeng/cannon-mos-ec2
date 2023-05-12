@@ -504,7 +504,9 @@ function randomTargets (number) {
   for (let i = 0; i < number; i++) {
     x = getRandomInt(4)
     y = getRandomInt(3)
-    ret.push({ x: x, y: y, id: shortUUID.generate() })
+    var hrTime = process.hrtime()
+    id = hrTime[0] + hrTime[1] + i
+    ret.push({ x: x, y: y, id: id })
   }
   return ret
 }

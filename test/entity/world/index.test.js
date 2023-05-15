@@ -9,6 +9,10 @@ test('create room', () => {
     world = new World(rs, us)
     world.create("r1", new User("u1"))
     console.log("after create", us, rs)
-    world.join("r1", new User("u2"))
+    //world.join("r1", new User("u2"))
     console.log("after join", us, rs)
+
+    //setTimeout(function() {
+    //}, 10000);
+    //console.log(rs.get("r1").mosquito)
 });

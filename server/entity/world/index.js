@@ -1,13 +1,24 @@
+myConst = require("../../const.js")
 const Room = require("../room/")
+const CMDQueue = require("../../model/local/queue.js")
+const process = require('process')
+
+const genInterval = process.env.GEN_MOS_INTERVAL || 2000
+const gameTime = process.env.GAME_TIME || 60000
+
+
+
 
 let World = class {
 
     roomStorage = {}
     userStorage = {}
+    queue = {}
 
     constructor(roomStorage, userStorage) {
         this.roomStorage = roomStorage
         this.userStorage = userStorage
+        this.queue = new CMDQueue(roomStorage)
     }
 
     // create createRoom
@@ -34,7 +45,20 @@ let World = class {
         room.addMosquito(2)
         user.setRoomInfo(room, 1)
 
-        // todo add generate task to queue
+        // generate mosquito automatically
+        var intervalObj = setInterval(() => {
+            var newTargetInfo = {
+                action: myConst.ACTION_NEW_MOSQUITO,
+                roomID: roomID
+            }
+            console.log("push task", newTargetInfo)
+            this.queue.push(newTargetInfo)
+        }, genInterval)
+
+        setTimeout(() => {
+            clearInterval(intervalObj);
+            this.stop(roomID)
+        }, gameTime)
 
         // todo   move storage logic 
         this.roomStorage.save(room)
@@ -43,20 +67,13 @@ let World = class {
         // todo notify users
     }
 
-    newMosquito(roomID) {
-        var room = this.roomStorage.get(roomID)
-        if ((room instanceof Room)) {
-            return new Error("roomStatsError")
-        }
-        room.addMosquito(2)
-        this.roomStorage.save(room)
-    }
-
     shoot() {
     }
 
     stop(roomID) {
     }
+
+
 }
 
 module.exports = World;

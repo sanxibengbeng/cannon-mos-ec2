@@ -7,7 +7,6 @@ let Mosquito = class {
             var y = this.getRandomInt(3)
             var id = this.index++
             ret.push({ x: x, y: y, id: id })
-            console.log("generate", ret)
         }
         return ret
     }

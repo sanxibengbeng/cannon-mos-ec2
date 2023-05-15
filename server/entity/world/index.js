@@ -1,19 +1,16 @@
 const Room = require("../room/")
-const Mosquito = require("../mosquito/")
 
 let World = class {
 
     roomStorage = {}
     userStorage = {}
-    mosquitoGroup = {}
 
     constructor(roomStorage, userStorage) {
         this.roomStorage = roomStorage
         this.userStorage = userStorage
-        this.mosquitoGroup = new Mosquito()
     }
 
-    // createRoom createRoom and init
+    // create createRoom
     create(roomID, user) {
         var room = this.roomStorage.get(roomID)
         if ((room instanceof Room) && !room.CanCreate()) {
@@ -27,22 +24,38 @@ let World = class {
         this.userStorage.save(user)
     }
 
+    // join  user joinRoom
     join(roomID, user) {
         var room = this.roomStorage.get(roomID)
         if ((room instanceof Room) && !room.canJoin()) {
             return new Error("roomStatsError")
         }
         room.setStat(room.STAT_FIGNTING)
-        room.addMosquito(this.mosquitoGroup.generate(2))
-
+        room.addMosquito(2)
         user.setRoomInfo(room, 1)
 
+        // todo add generate task to queue
+
+        // todo   move storage logic 
         this.roomStorage.save(room)
         this.userStorage.save(user)
+
+        // todo notify users
+    }
+
+    newMosquito(roomID) {
+        var room = this.roomStorage.get(roomID)
+        if ((room instanceof Room)) {
+            return new Error("roomStatsError")
+        }
+        room.addMosquito(2)
+        this.roomStorage.save(room)
     }
 
     shoot() {
+    }
 
+    stop(roomID) {
     }
 }
 

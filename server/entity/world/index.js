@@ -24,7 +24,7 @@ let World = class {
     // create createRoom
     create(roomID, user) {
         var room = this.roomStorage.get(roomID)
-        if ((room instanceof Room) && !room.CanCreate()) {
+        if ((room instanceof Room) && !room.canCreate()) {
             return new Error("roomReplicate")
         }
 
@@ -85,6 +85,7 @@ let World = class {
             return new Error("roomStatsError")
         }
         room.stop()
+        this.roomStorage.delete(roomID)
     }
 
 

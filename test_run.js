@@ -28,6 +28,7 @@ test = () => {
 
     setTimeout(function () {
         clearInterval(intervalObj);
-    }, 40000)
+        console.log("after stop", JSON.stringify(us), JSON.stringify(rs))
+    }, 70000)
 }
 test()

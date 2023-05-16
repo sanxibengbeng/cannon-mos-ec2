@@ -1,5 +1,6 @@
 myConst = require("../../const.js")
 const Room = require("../room/")
+const User = require("../user/")
 const CMDQueue = require("../../model/local/queue.js")
 const process = require('process')
 
@@ -25,7 +26,12 @@ let World = class {
     create(roomID, user) {
         var room = this.roomStorage.get(roomID)
         if ((room instanceof Room) && !room.canCreate()) {
-            return new Error("roomReplicate")
+            var msg = {
+                type: "error",
+                msg: JSON.stringify({ type: "room duplicated" })
+            }
+            user.notify(msg)
+            return new Error("roomDuplicated")
         }
 
         room = new Room(roomID, user)
@@ -38,7 +44,12 @@ let World = class {
     // join  user joinRoom
     join(roomID, user) {
         var room = this.roomStorage.get(roomID)
-        if ((room instanceof Room) && !room.canJoin()) {
+        if (!(room instanceof Room) || !room.canJoin()) {
+            var msg = {
+                type: "error",
+                msg: JSON.stringify({ type: "room occupied" })
+            }
+            user.notify(msg)
             return new Error("roomStatsError")
         }
         user.setRoomInfo(room, 1)
@@ -86,6 +97,18 @@ let World = class {
         }
         room.stop()
         this.roomStorage.delete(roomID)
+    }
+
+    userLeft(userID) {
+        var user = this.userStorage.get(userID)
+        if (!(user instanceof User)) {
+            return new Error("userStatsError")
+        }
+        var room = this.roomStorage.get(user.roomID)
+        if (!(room instanceof Room)) {
+            return new error("roomstatserror")
+        }
+        room.userLeft(user)
     }
 
 

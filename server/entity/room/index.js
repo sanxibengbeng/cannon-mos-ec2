@@ -21,6 +21,15 @@ let Room = class {
         console.log("roomID", this.roomID, "created", new Date())
     }
 
+    userLeft(user) {
+        delete(this.users[user.index])
+        var msg = {
+            type: "error",
+            msg: JSON.stringify({ type: "user left" })
+        }
+        this.notifyUsers(msg)
+    }
+
     userJoined(user) {
         this.setStat(this.STAT_FIGNTING)
         this.users.push(user)

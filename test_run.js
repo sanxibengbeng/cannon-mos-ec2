@@ -21,6 +21,8 @@ test = () => {
         },
         "angle":116.07306671142578
     }
+    world.userLeft("u1")
+    console.log("after user leave ", JSON.stringify(us), JSON.stringify(rs))
 
     intervalObj = setInterval(() =>{
         world.shoot("u2", shootParam)

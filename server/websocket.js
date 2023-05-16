@@ -45,7 +45,7 @@ router.ws('/', (ws, req) => {
   ws.onmessage = msgHandler
 
   var closeHandle = (event) => {
-    console.log("connection closed", user, event)
+    world.userLeft(user.userID)
   }
   ws.onclose =  closeHandle
 })

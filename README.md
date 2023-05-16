@@ -1,6 +1,7 @@
 *重点在于理解练习webSocket通信机制，后端使用express  express-ws进行websocket支持*
 
 ## 运行程序
+### linux 平台运行
 
 1. 安装 nodejs 及相关工具
 ```
@@ -9,12 +10,16 @@
     sudo npm install cross-env -g
 ```
 
-2. 启动
+2. 启动应用程序
+
 ``` npm start ```
 
 3. 查看运行状态
+
 ``` forever list ```
+
 4. 重启
+
 ``` forever restartall ```
 
 ## 访问并测试游戏

@@ -18,7 +18,7 @@ let World = class {
     constructor(roomStorage, userStorage) {
         this.roomStorage = roomStorage
         this.userStorage = userStorage
-        this.queue = new CMDQueue(roomStorage)
+        this.queue = new CMDQueue(roomStorage, userStorage)
     }
 
     // create createRoom
@@ -41,9 +41,8 @@ let World = class {
         if ((room instanceof Room) && !room.canJoin()) {
             return new Error("roomStatsError")
         }
-        room.setStat(room.STAT_FIGNTING)
-        room.addMosquito(2)
         user.setRoomInfo(room, 1)
+        room.userJoined(user)
 
         // generate mosquito automatically
         var intervalObj = setInterval(() => {
@@ -51,7 +50,7 @@ let World = class {
                 action: myConst.ACTION_NEW_MOSQUITO,
                 roomID: roomID
             }
-            console.log("push task", newTargetInfo)
+            //console.log("push task", newTargetInfo)
             this.queue.push(newTargetInfo)
         }, genInterval)
 
@@ -63,14 +62,29 @@ let World = class {
         // todo   move storage logic 
         this.roomStorage.save(room)
         this.userStorage.save(user)
-
-        // todo notify users
     }
 
-    shoot() {
+    //  params'{"action":"shoot","origin":{"x":5.0,"y":-4.0},"angle":116.07306671142578}'
+    shoot(userID, param) {
+        var shootInfo =  {
+            action: myConst.ACTION_SHOOT,
+            angle:param.angle,
+            origin:{
+                x:param.origin.x,
+                y:param.origin.y,
+            },
+            userID: userID,
+        }
+        //console.log("push task", shootInfo)
+        this.queue.push(shootInfo)
     }
 
     stop(roomID) {
+        var room = this.roomStorage.get(roomID)
+        if (!(room instanceof Room)) {
+            return new Error("roomStatsError")
+        }
+        room.stop()
     }
 
 

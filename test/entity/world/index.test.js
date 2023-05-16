@@ -11,7 +11,6 @@ test('create room', () => {
     console.log("after create", us, rs)
     //world.join("r1", new User("u2"))
     console.log("after join", us, rs)
-
     //setTimeout(function() {
     //}, 10000);
     //console.log(rs.get("r1").mosquito)

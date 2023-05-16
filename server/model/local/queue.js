@@ -5,9 +5,11 @@ const Room = require("../../entity/room/")
 
 let CMDQueue = class {
     roomStorage = {}
+    userStorage = {}
     que = {}
-    constructor(roomStorage) {
+    constructor(roomStorage, userStorage) {
         this.roomStorage = roomStorage
+        this.userStorage = userStorage
         this.que = new Queue(this.taskHandler(), 1)
     }
 
@@ -32,20 +34,23 @@ let CMDQueue = class {
         }
     }
     handleNewMosquito(info) {
-        console.log("handle new mosquito", info)
+        //console.log("handle new mosquito", info)
         var roomID = info.roomID
         var room = this.roomStorage.get(roomID)
         if (!(room instanceof Room)) {
             return new Error("roomStatsError")
         }
         room.addMosquito(2)
-        // todo  notify users
         this.roomStorage.save(room)
     }
 
     handleShoot(info) {
-        console.log("handle shoot", info)
-        //todo shoot
+        // console.log("handle shoot", info)
+        var userID = info.userID
+        var user = this.userStorage.get(userID)
+        var room = this.roomStorage.get(user.roomID)
+        room.shoot(user, info)
+        this.roomStorage.save(room)
     }
 
 }

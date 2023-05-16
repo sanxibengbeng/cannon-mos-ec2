@@ -8,11 +8,26 @@ test = () => {
     rs = new RoomStorage()
     world = new World(rs, us)
     world.create("r1", new User("u1"))
-    console.log("after create", us, rs)
+    console.log("after create", JSON.stringify(us), JSON.stringify(rs))
     world.join("r1", new User("u2"))
-    console.log("after join", us, rs)
+    console.log("after join", JSON.stringify(us), JSON.stringify(rs))
+
+    shootParam= {
+        "action":"shoot",
+        "origin":{
+            "x":5,
+            "y":-4
+        },
+        "angle":116.07306671142578
+    }
+
+    intervalObj = setInterval(() =>{
+        world.shoot("u2", shootParam)
+        console.log("after shoot", JSON.stringify(us), JSON.stringify(rs))
+    }, 10000)
 
     setTimeout(function () {
-    }, 10)
+        clearInterval(intervalObj);
+    }, 40000)
 }
 test()

@@ -11,7 +11,8 @@ let Mosquito = class {
         return ret
     }
     getRandomInt(size) {
-        return Math.floor(Math.random() * (size * 2 + 1)) - size
+        //return Math.floor(Math.random() * (size * 2 + 1)) - size
+        return Math.random() * (size * 2 + 1) - size
     }
 }
 

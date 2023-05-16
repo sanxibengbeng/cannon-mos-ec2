@@ -12,17 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^3.2.4",
-    "aws-sdk": "^2.1359.0",
-    "aws-xray-sdk": "^3.5.0",
-    "better-queue": "^3.8.12",
     "dotenv": "^16.0.3",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "fastq": "^1.15.0",
     "nodemon": "^2.0.22",
-    "short-uuid": "^4.2.2",
-    "ws": "^7.1.0"
+    "short-uuid": "^4.2.2"
   },
   "devDependencies": {
     "jest": "^29.5.0"

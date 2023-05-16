@@ -13,19 +13,6 @@ expressWs(app);
 app.use(express.static('public'))
 app.use('/wss', websocket)
 
-var connectHandler = require('../lambda/default/index')
-app.get('/testcmd', (req, res) => {
-  var req = {
-    'body': req.query.data,
-    'requestContext': {
-      'connectionId': 'abc',
-      'domain': 'host',
-      'stage': 'stage',
-    },
-  }
-  connectHandler.handler(req)
-  res.send('{}')
-})
 port = process.env.PORT|| 3000
 app.listen(port, () => {
   console.log('server is listening on port ' + port)

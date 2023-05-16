@@ -1,57 +1,53 @@
+const RoomStorage = require("./model/local/roomStorage");
+const UserStorage = require("./model/local/userStorage");
+const World = require("./entity/world")
+const User = require("./entity/user")
+
 const express = require('express');
 const expressWs = require('express-ws')
 const router = express.Router()
 const short = require("short-uuid");
 
+var us = new UserStorage()
+var rs = new RoomStorage()
+var world = new World(rs, us)
+
 expressWs(router);
 
-var connectHandler = require('../lambda/default/index')
-var disConnectHandler = require('../lambda/disconnect/index')
-var wsMap = {}
 
 router.ws('/', (ws, req) => {
-  var callbackFunc = (err, res) => {
-    console.log("callback", err, res)
-    ws.send(res.body)
+  getNotifyFunc = ()=>{
+    return (msg)=>{
+      ws.send(JSON.stringify(msg))
+    }
   }
   const uuid = short.generate()
-  wsMap[uuid] = ws
-  var req = {
-    'requestContext': {
-      'connectionId': uuid,
-      'domain': 'host',
-      'stage': 'stage',
-      'wsMap': wsMap,
-    },
+  var user = new User(uuid, getNotifyFunc())
+
+  var msgHandler= (event) => {
+    request = JSON.parse(event['data'])
+    switch (request['action']) {
+      case 'create':
+        world.create(request["room"], user)
+        break
+      case 'join':
+        world.join(request["room"], user)
+        break
+      case 'shoot':
+        world.shoot(user.userID, request)
+        break
+      default:
+        console.log('default')
+        break
+    }
   }
-  console.log('wss uuid', uuid)
-  var msgHandle = (event) => {
-    req.body = event['data']
-    console.log("handling", req)
-    connectHandler.handler(req, {}, callbackFunc)
-  }
-  ws.onmessage = msgHandle
+
+  ws.onmessage = msgHandler
 
   var closeHandle = (event) => {
-    req.body = event['data'] || '{}'
-    console.log("closing", req)
-    disConnectHandler.handler(req, {}, (err, msg)=>{
-      console.log("closing callback", err, msg)
-    })
+    world.userLeft(user.userID)
   }
   ws.onclose =  closeHandle
-
-  // todo 定时指行closeHandle 清理数据
-
-  //ws.send('连接成功')
-  //let interval
-  //interval = setInterval(() => {
-  //  if (ws.readyState === ws.OPEN) {
-  //    ws.send(Math.random().toFixed(2))
-  //  } else {
-  //    clearInterval(interval)
-  //  }
-  //}, 1000)
 })
 
 module.exports = router

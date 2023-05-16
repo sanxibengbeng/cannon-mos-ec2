@@ -11,16 +11,19 @@
 ```
 
 2. 启动应用程序
-
-``` npm start ```
+``` 
+npm start 
+```
 
 3. 查看运行状态
-
-``` forever list ```
+``` 
+forever list 
+```
 
 4. 重启
-
-``` forever restartall ```
+``` 
+forever restartall 
+```
 
 ## 访问并测试游戏
 如果是单机运行可以访问：

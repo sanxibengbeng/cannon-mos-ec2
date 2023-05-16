@@ -1,4 +1,4 @@
-canhit = require("../../../lambda/logic/canhit").canHitTarget
+canhit = require("../../server/logic/canhit")
 
 test('canhit self', () => {
     expect(canhit(1, 1, 10, 1, 1)).toBe(true);

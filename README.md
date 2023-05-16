@@ -1,4 +1,5 @@
-*重点在于理解练习webSocket通信机制，后端使用express  express-ws进行websocket支持*
+## 介绍
+针对游戏 https://github.com/DiscreteTom/CannonVsMosquito 的单机版服务端接口实现
 
 ## 运行程序
 ### linux 平台运行

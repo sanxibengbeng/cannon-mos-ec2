@@ -8,6 +8,7 @@ test = () => {
     rs = new RoomStorage()
     world = new World(rs, us)
     world.create("r1", new User("u1"))
+    world.create("r2", new User("u11"))
     console.log("after create", JSON.stringify(us), JSON.stringify(rs))
     world.join("r1", new User("u2"))
     console.log("after join", JSON.stringify(us), JSON.stringify(rs))

@@ -49,6 +49,9 @@ let CMDQueue = class {
         var userID = info.userID
         var user = this.userStorage.get(userID)
         var room = this.roomStorage.get(user.roomID)
+        if (!(room instanceof Room)) {
+            return new Error("roomStatsError")
+        }
         room.shoot(user, info)
         this.roomStorage.save(room)
     }

@@ -106,7 +106,7 @@ let World = class {
         }
         var room = this.roomStorage.get(user.roomID)
         if (!(room instanceof Room)) {
-            return new error("roomstatserror")
+            return new Error("roomstatserror")
         }
         room.userLeft(user)
     }

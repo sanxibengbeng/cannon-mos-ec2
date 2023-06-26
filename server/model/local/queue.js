@@ -40,7 +40,7 @@ let CMDQueue = class {
         if (!(room instanceof Room)) {
             return new Error("roomStatsError")
         }
-        room.addMosquito(2)
+        room.addMosquito(10)
         this.roomStorage.save(room)
     }
 
